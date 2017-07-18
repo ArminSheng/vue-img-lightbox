@@ -1,29 +1,34 @@
 import ImgFull from './ImgFull'
 
-// Vue install
-export default Vue => {
-  const Lightbox = Vue.extend(ImgFull)
-  const instance
+let instance
 
-  Vue.directive('v-img-view', {
+// Vue install
+const install = (Vue) => {
+  const Lightbox = Vue.extend(ImgFull)
+
+  Vue.directive('img-view', {
     bind (el, binding) {
-      const src = el.src || binding.expression
+      const src = binding.value || el.src
 
       if (!src) {
-        console.warn('Binding elment must be Image!')
+        console.error('Binding element missing src!')
         return
       }
 
-      el.onclick(() => {
+      el.onclick = () => {
         if (!instance) {
           const container = document.createElement('div')
-          instance = new Lightbox().$mount(container)
-          document.body.appenChild(container)
+          container.id = 'v-img-view'
+
+          document.body.appendChild(container)
+          instance = new Lightbox().$mount('#v-img-view')
         }
 
-        instance.src = el.src
+        instance.src = src
         instance.open()
-      })
+      }
     }
   })
 }
+
+export default install
