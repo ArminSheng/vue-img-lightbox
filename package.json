@@ -1,0 +1,27 @@
+{
+  "name": "vue-img-lightbox",
+  "version": "1.0.0",
+  "description": "A vue plugin for image lightbox",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ArminSheng/vue-img-lightbox.git"
+  },
+  "keywords": [
+    "vue",
+    "Image",
+    "Lightbox"
+  ],
+  "author": "armin sheng",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ArminSheng/vue-img-lightbox/issues"
+  },
+  "homepage": "https://github.com/ArminSheng/vue-img-lightbox#readme",
+  "dependencies": {
+    "vue": "^2.4.2"
+  }
+}
