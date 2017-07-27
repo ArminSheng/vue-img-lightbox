@@ -1,12 +1,13 @@
 <template>
   <transition name="fade" mode="out-in">
     <div
-      @click="close"
       class="bbc-img-full"
-      @touchmove.stop.prevent
       flex="main:center cross:center"
+      @touchmove.stop.prevent
       v-show="visible">
-      <img
+      <div
+        flex
+        ref="container"
         @touchmove.stop.prevent="onMove($event)"
         @touchstart="onStart($event)"
         @touchend="onTouchEnd($event)"
@@ -14,7 +15,18 @@
           transform: translate,
           transition: 'all ' + duration + 'ms'
         }"
-        :src="src">
+        class="content">
+          <div
+            :style="{
+              transform: 'scale(' + scale + ')',
+              transition: 'all ' + duration + 'ms'
+            }"
+            v-for="src in images"
+            flex-box="0"
+            class="touch-item">
+            <img :src="src">
+          </div>
+      </div>
       <div class="modal"></div>
     </div>
   </transition>
@@ -23,13 +35,23 @@
 <script>
   let startX = 0
   let startY = 0
+
+  let offsetY = 0
+  let offsetX = 0
+
+  let absX = 0
+  let absY = 0
+
   let direction
-  let needClose = false
+  let touchStartTime
+  const FAST_CLICK_T = 200
+  const TRANSITION_T = 300
 
   export default {
     name: 'img-full',
     props: {
-      src: String
+      images: Array,
+      index: 0
     },
     data () {
       return {
@@ -37,20 +59,28 @@
         offsetY: 0,
         offsetX: 0,
         scale: 1,
-        duration: 0
+        duration: 0,
+        currentIndex: this.index,
+        isSlide: false,
+        clientWidth: document.body.clientWidth
       }
     },
 
     computed: {
       translate () {
-        let { offsetX, offsetY, scale } = this
-        return `translate(${offsetX}px, ${offsetY}px) scale(${scale})`
+        let { offsetX, offsetY } = this
+        return `translate(${offsetX}px, ${offsetY}px)`
+      },
+
+      length () {
+        return this.images.length || 0
       }
     },
 
     methods: {
       open () {
         this.visible = true
+        this.initParams(this.index)
         this.resetTransformation()
       },
 
@@ -58,44 +88,121 @@
         this.visible = false
       },
 
+      onFastClick () {
+        this.isSlide = true
+        this.close()
+      },
+
+      // TODO
       onDoubleClick () {
       },
 
-      doSlideClose () {
-        this.offsetY = this.$el.clientHeight
+      next () {
+        if (this.hasNext()) {
+          this.slide(++this.currentIndex)
+        }
+      },
 
+      prev () {
+        if (this.hasPrev()) {
+          this.slide(--this.currentIndex)
+        }
+      },
+
+      slide (index) {
+        let { clientWidth, addTransitionTime } = this
+        this.isSlide = true
+        this.offsetX = -index * clientWidth
+        addTransitionTime(() => {
+          this.isSlide = false
+        })
+      },
+
+      hasPrev () {
+        return this.currentIndex > 0
+      },
+
+      hasNext () {
+        return this.currentIndex < this.length - 1
+      },
+
+      doSlideClose () {
+        this.isSlide = true
         this.duration = 200
-        setTimeout(() => {
-          this.duration = 0
-          this.close()
-          // this.resetTransformation()
-        }, 200)
+        this.offsetY = this.$el.clientHeight
+        this.addTransitionTime(this.close, this.duration)
       },
 
       resetTransformation () {
-        this.offsetY = this.offsetX = 0
+        let { currentIndex, clientWidth } = this
+        this.offsetY = 0
+        this.offsetX = -currentIndex * clientWidth
+
         direction = undefined
         this.scale = 1
+        this.isSlide = false
 
-        this.duration = 300
+        offsetX = 0
+        offsetY = 0
+        absX = 0
+        absY = 0
+
+        this.addTransitionTime()
+      },
+
+      initParams (index) {
+        this.currentIndex = index || 0
+        this.scale = 1
+        this.isSlide = false
+
+        direction = undefined
+        offsetX = 0
+        offsetY = 0
+        absX = 0
+        absY = 0
+      },
+
+      addTransitionTime (callback, time = TRANSITION_T) {
+        this.duration = time
         setTimeout(() => {
           this.duration = 0
-        }, 300)
+          callback && callback()
+        }, time)
       },
 
       onStart (e) {
         startX = e.touches[0].pageX
         startY = e.touches[0].pageY
+
+        absX = 0
+        absY = 0
+
+        touchStartTime = new Date()
       },
 
       onTouchEnd (e) {
-        this.resetTransformation()
-
-        if (needClose) {
-          this.doSlideClose()
+        const endT = new Date()
+        if (endT - touchStartTime < FAST_CLICK_T &&
+          absX === 0 &&
+          absY === 0) {
+          this.onFastClick()
+          return
         }
 
-        needClose = false
+        if (direction === 'horizontal') {
+          if (absX > 50) {
+            offsetX > 0 ? this.prev() : this.next()
+          }
+        } else {
+          if (absY > 100) {
+            this.doSlideClose()
+            return
+          }
+        }
+
+        if (!this.isSlide) {
+          this.resetTransformation()
+        }
       },
 
       onMove (e) {
@@ -105,10 +212,14 @@
           return
         }
 
-        let offsetY = touches[0].pageY - startY
-        let offsetX = touches[0].pageX - startX
-        let absX = Math.abs(offsetX)
-        let absY = Math.abs(offsetY)
+        if (this.isSlide) {
+          return
+        }
+
+        offsetY = touches[0].pageY - startY
+        offsetX = touches[0].pageX - startX
+        absX = Math.abs(offsetX)
+        absY = Math.abs(offsetY)
 
         if (!direction && absY > absX) {
           direction = 'vertical'
@@ -117,16 +228,25 @@
         }
 
         if (direction === 'horizontal') {
-          this.offsetX = offsetX / 2
+          this.offsetMove(offsetX)
         } else {
-          this.offsetY = offsetY / 1.1
+          this.offsetY = offsetY
           if (offsetY > 0) {
+            // Do scale
             this.scale = 1 - Math.abs(offsetY / 1000)
-            if (absY > 100) {
-              needClose = true
-            }
           }
         }
+      },
+
+      offsetMove (offset) {
+        let {
+          currentIndex,
+          clientWidth
+        } = this
+
+        this.offsetX = currentIndex === 0
+          ? offset
+          : (-currentIndex * clientWidth) + offset
       }
     }
   }
@@ -147,12 +267,22 @@
       height: 100%;
       opacity: 0.5;
       background: #000;
-      padding: 10% 0;
     }
-    img {
+    .content {
       z-index: 1000;
       opacity: 1;
       width: 100%;
+      position: relative;
+      transition-property: transform;
+      box-sizing: content-box;
+      overflow: visible;
+      .touch-item {
+        width: 100%;
+        height: 100%;
+      }
+      img {
+        width: 100%;
+      }
     }
   }
 </style>

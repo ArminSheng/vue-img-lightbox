@@ -4,23 +4,32 @@ let Lightbox
 let instance
 
 const initialize = (el, binding) => {
-  const src = binding.value || el.src
+  let images
 
-  if (!src) {
-    // console.error('Binding element missing src!')
+  if (binding.arg === 'group') {
+    images = binding.value
+  } else {
+    images = [el.src]
+  }
+
+  if (!images) {
+    // console.error('Binding element missing images!')
     return
   }
 
+  if (!instance) {
+    const container = document.createElement('div')
+    container.id = 'v-img-view'
+
+    document.body.appendChild(container)
+    instance = new Lightbox().$mount('#v-img-view')
+  }
+
+  instance.images = images
+
   el.onclick = () => {
-    if (!instance) {
-      const container = document.createElement('div')
-      container.id = 'v-img-view'
-
-      document.body.appendChild(container)
-      instance = new Lightbox().$mount('#v-img-view')
-    }
-
-    instance.src = src
+    const currentIndex = images.indexOf(el.src)
+    instance.index = currentIndex
     instance.open()
   }
 }
