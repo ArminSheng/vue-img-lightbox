@@ -21,7 +21,7 @@
               transform: 'scale(' + scale + ')',
               transition: 'all ' + duration + 'ms'
             }"
-            v-for="src in images"
+            v-for="src in images || imagesArr"
             flex-box="0"
             class="touch-item">
             <img :src="src">
@@ -62,7 +62,8 @@
         duration: 0,
         currentIndex: this.index,
         isSlide: false,
-        clientWidth: document.body.clientWidth
+        clientWidth: document.body.clientWidth,
+        imagesArr: []
       }
     },
 
@@ -80,7 +81,7 @@
     methods: {
       open () {
         this.visible = true
-        this.initParams(this.index)
+        this.initParams(this.currentIndex)
         this.resetTransformation()
       },
 
@@ -259,6 +260,7 @@
     top: 0;
     width: 100%;
     height: 100%;
+    z-index: 2000;
     .modal {
       position: fixed;
       left: 0;

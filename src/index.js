@@ -18,20 +18,25 @@ const initialize = (el, binding) => {
   }
 
   if (!instance) {
-    const container = document.createElement('div')
-    container.id = 'v-img-view'
-
-    document.body.appendChild(container)
-    instance = new Lightbox().$mount('#v-img-view')
+    instance = createInstance()
   }
 
   instance.images = images
 
   el.onclick = () => {
     const currentIndex = images.indexOf(el.src)
-    instance.index = currentIndex
+    instance.index = instance.currentIndex = currentIndex
     instance.open()
   }
+}
+
+const createInstance = () => {
+  const container = document.createElement('div')
+  container.id = 'v-img-view'
+
+  document.body.appendChild(container)
+  const instance = new Lightbox().$mount('#v-img-view')
+  return instance
 }
 
 // Vue install
@@ -44,4 +49,4 @@ const install = (Vue) => {
   })
 }
 
-export default install
+export {install, ImgFull}
