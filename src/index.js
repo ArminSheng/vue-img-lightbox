@@ -1,12 +1,17 @@
-import ImgFull from './ImgFull'
+import LightboxComponent from './LightboxComponent'
 
 let Lightbox
 let instance
+let images
 
 const initialize = (el, binding) => {
-  let images
-
   if (binding.arg === 'group') {
+    // if (images && images !== binding.value) {
+    //   instance = createInstance(images)
+    //   console.log('group')
+    // } else {
+    //   // images = binding.value
+    // }
     images = binding.value
   } else {
     images = [el.src]
@@ -18,35 +23,38 @@ const initialize = (el, binding) => {
   }
 
   if (!instance) {
-    instance = createInstance()
+    instance = createInstance(binding.value)
   }
 
-  instance.images = images
-
   el.onclick = () => {
-    const currentIndex = images.indexOf(el.src)
+    const currentIndex = instance.images.indexOf(el.src)
     instance.index = instance.currentIndex = currentIndex
     instance.open()
   }
 }
 
-const createInstance = () => {
+const createInstance = (images) => {
   const container = document.createElement('div')
   container.id = 'v-img-view'
-
   document.body.appendChild(container)
+
   const instance = new Lightbox().$mount('#v-img-view')
+  instance.images = images
+
   return instance
 }
 
 // Vue install
 const install = (Vue) => {
-  Lightbox = Vue.extend(ImgFull)
+  if (!install.installed) {
+    Vue.component(LightboxComponent.name, LightboxComponent)
+  }
+
+  Lightbox = Vue.extend(LightboxComponent)
 
   Vue.directive('img-view', {
-    bind: initialize,
-    update: initialize
+    bind: initialize
   })
 }
 
-export {install, ImgFull}
+export default install

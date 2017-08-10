@@ -48,7 +48,7 @@
   const TRANSITION_T = 300
 
   export default {
-    name: 'img-full',
+    name: 'img-lightbox',
     props: {
       images: Array,
       index: 0
