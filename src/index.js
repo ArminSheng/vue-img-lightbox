@@ -2,16 +2,10 @@ import LightboxComponent from './LightboxComponent'
 
 let Lightbox
 let instance
-let images
 
 const initialize = (el, binding) => {
+  let images
   if (binding.arg === 'group') {
-    // if (images && images !== binding.value) {
-    //   instance = createInstance(images)
-    //   console.log('group')
-    // } else {
-    //   // images = binding.value
-    // }
     images = binding.value
   } else {
     images = [el.src]
@@ -23,12 +17,12 @@ const initialize = (el, binding) => {
   }
 
   if (!instance) {
-    instance = createInstance(binding.value)
+    instance = createInstance(images)
   }
 
   el.onclick = () => {
-    const currentIndex = instance.images.indexOf(el.src)
-    instance.index = instance.currentIndex = currentIndex
+    instance.setImages(images)
+    instance.setIndex(el.src)
     instance.open()
   }
 }
@@ -39,7 +33,7 @@ const createInstance = (images) => {
   document.body.appendChild(container)
 
   const instance = new Lightbox().$mount('#v-img-view')
-  instance.images = images
+  instance.setImages(images)
 
   return instance
 }

@@ -21,7 +21,7 @@
               transform: 'scale(' + scale + ')',
               transition: 'all ' + duration + 'ms'
             }"
-            v-for="src in images || imagesArr"
+            v-for="src in imagesArr"
             flex-box="0"
             class="touch-item">
             <img :src="src">
@@ -62,8 +62,8 @@
         duration: 0,
         currentIndex: this.index,
         isSlide: false,
-        clientWidth: document.body.clientWidth,
-        imagesArr: []
+        clientWidth: document.body.clientWidth
+        // imagesArr: this.images
       }
     },
 
@@ -75,6 +75,10 @@
 
       length () {
         return this.images.length || 0
+      },
+
+      imagesArr () {
+        return this.images
       }
     },
 
@@ -83,6 +87,18 @@
         this.visible = true
         this.initParams(this.currentIndex)
         this.resetTransformation()
+      },
+
+      setImages (arr) {
+        this.images = arr
+      },
+
+      setIndex (idxOrSrc) {
+        if (typeof idxOrSrc === 'number') {
+          this.currentIndex = idxOrSrc
+        } else {
+          this.currentIndex = this.imagesArr.indexOf(idxOrSrc)
+        }
       },
 
       close () {
