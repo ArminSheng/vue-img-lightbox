@@ -47,7 +47,8 @@ const install = (Vue) => {
   Lightbox = Vue.extend(LightboxComponent)
 
   Vue.directive('img-view', {
-    bind: initialize
+    bind: initialize,
+    update: initialize
   })
 }
 
