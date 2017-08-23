@@ -23,8 +23,10 @@
             }"
             v-for="src in imagesArr"
             flex-box="0"
+            flex="main:center cross:center"
             class="touch-item">
-            <img :src="src">
+            <img
+            :src="src">
           </div>
       </div>
       <div class="modal"></div>
@@ -290,13 +292,15 @@
       z-index: 1000;
       opacity: 1;
       width: 100%;
+      height: 100%;
       position: relative;
       transition-property: transform;
       box-sizing: content-box;
       overflow: visible;
       .touch-item {
         width: 100%;
-        height: 100%;
+        margin: 30px 0;
+        // height: 100%;
       }
       img {
         width: 100%;
