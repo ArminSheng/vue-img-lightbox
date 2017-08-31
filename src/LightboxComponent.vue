@@ -21,7 +21,12 @@
               transform: 'scale(' + scale + ')',
               transition: 'all ' + duration + 'ms'
             }"
-            v-for="src in imagesArr"
+            v-for="(src, $index) in imagesArr"
+            :class="{
+              'active': $index === currentIndex,
+              'prev': $index === currentIndex - 1,
+              'next': $index === currentIndex + 1
+            }"
             flex-box="0"
             flex="main:center cross:center"
             class="touch-item">
@@ -29,7 +34,12 @@
             :src="src">
           </div>
       </div>
-      <div class="modal"></div>
+      <div
+        class="modal"
+        :style="{
+          opacity: opacity
+        }">
+      </div>
     </div>
   </transition>
 </template>
@@ -48,6 +58,9 @@
   let touchStartTime
   const FAST_CLICK_T = 200
   const TRANSITION_T = 300
+  const SLIDE_DISTANCE = 50
+  const CLOSE_DISTANCE = 100
+  const OPACITY_RATIO = 400
 
   export default {
     name: 'img-lightbox',
@@ -57,6 +70,7 @@
     },
     data () {
       return {
+        opacity: 1,
         visible: false,
         offsetY: 0,
         offsetX: 0,
@@ -159,6 +173,7 @@
 
         direction = undefined
         this.scale = 1
+        this.opacity = 1
         this.isSlide = false
 
         offsetX = 0
@@ -209,11 +224,11 @@
         }
 
         if (direction === 'horizontal') {
-          if (absX > 50) {
+          if (absX > SLIDE_DISTANCE) {
             offsetX > 0 ? this.prev() : this.next()
           }
         } else {
-          if (absY > 100) {
+          if (absY > CLOSE_DISTANCE) {
             this.doSlideClose()
             return
           }
@@ -250,6 +265,7 @@
           this.offsetMove(offsetX)
         } else {
           this.offsetY = offsetY
+          this.opacity = 1 - (absY / OPACITY_RATIO)
           if (offsetY > 0) {
             // Do scale
             this.scale = 1 - Math.abs(offsetY / 1000)
@@ -299,7 +315,12 @@
       .touch-item {
         width: 100%;
         margin: 30px 0;
-        // height: 100%;
+        &.prev {
+          transform: translate(-20px, 0) !important;
+        }
+        &.next {
+          transform: translate(20px, 0) !important;
+        }
       }
       img {
         width: 100%;
