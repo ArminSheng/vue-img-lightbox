@@ -22,7 +22,7 @@ const initialize = (el, binding) => {
 
   el.onclick = () => {
     instance.setImages(images)
-    instance.setIndex(el.src)
+    instance.setIndex(el.src || el.attributes.src.value)
     instance.open()
   }
 }
