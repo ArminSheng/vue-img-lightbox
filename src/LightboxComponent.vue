@@ -5,6 +5,9 @@
       flex="main:center cross:center"
       @touchmove.stop.prevent
       v-show="visible">
+      <div class="swipe-pagination">
+        {{ currentIndex + 1 }} / {{ size }}
+      </div>
       <div
         flex
         ref="container"
@@ -16,23 +19,23 @@
           transition: 'all ' + duration + 'ms'
         }"
         class="content">
-          <div
-            :style="{
-              transform: 'scale(' + scale + ')',
-              transition: 'all ' + duration + 'ms'
-            }"
-            v-for="(src, $index) in imagesArr"
-            :class="{
-              'active': $index === currentIndex,
-              'prev': $index === currentIndex - 1,
-              'next': $index === currentIndex + 1
-            }"
-            flex-box="0"
-            flex="main:center cross:center"
-            class="touch-item">
-            <img
-            :src="src">
-          </div>
+        <div
+          :style="{
+            transform: 'scale(' + scale + ')',
+            transition: 'all ' + duration + 'ms'
+          }"
+          v-for="(src, $index) in imagesArr"
+          :class="{
+            'active': $index === currentIndex,
+            'prev': $index === currentIndex - 1,
+            'next': $index === currentIndex + 1
+          }"
+          flex-box="0"
+          flex="main:center cross:center"
+          class="touch-item">
+          <img
+          :src="src">
+        </div>
       </div>
       <div
         class="modal"
@@ -65,7 +68,12 @@
   export default {
     name: 'img-lightbox',
     props: {
-      images: Array,
+      images: {
+        type: Array,
+        default () {
+          return []
+        }
+      },
       index: 0
     },
     data () {
@@ -89,7 +97,7 @@
         return `translate(${offsetX}px, ${offsetY}px)`
       },
 
-      length () {
+      size () {
         return this.images.length || 0
       },
 
@@ -156,7 +164,7 @@
       },
 
       hasNext () {
-        return this.currentIndex < this.length - 1
+        return this.currentIndex < this.size - 1
       },
 
       doSlideClose () {
@@ -302,6 +310,13 @@
       width: 100%;
       height: 100%;
       background: #000;
+    }
+    .swipe-pagination {
+      position: fixed;
+      top: 5px;
+      left: 15px;
+      color: #fff;
+      z-index: 2000;
     }
     .content {
       z-index: 1000;
