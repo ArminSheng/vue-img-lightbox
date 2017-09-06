@@ -21,8 +21,9 @@
         class="content">
         <div
           :style="{
-            transform: 'scale(' + scale + ')',
-            transition: 'all ' + duration + 'ms'
+            transform: $index === currentIndex
+              ? 'scale(' + scale + ')'
+              : ''
           }"
           v-for="(src, $index) in imagesArr"
           :class="{
