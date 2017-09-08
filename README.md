@@ -1,5 +1,7 @@
 # vue-img-lightbox (For mobile)
 
+[DEMO](/assets/demo_gif.gif)
+
 ## How to use it
 ```
 <!-- Single -->
