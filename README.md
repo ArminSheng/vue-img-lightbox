@@ -2,7 +2,16 @@
 
 ![image](/assets/demo_gif.gif)
 
-## How to use it
+## Usage
+
+### Import
+```
+Import ImgView from 'vue-img-lightbox'
+Vue.use(ImgView)
+
+```
+
+### Directive
 ```
 <!-- Single -->
 <img :src="src" v-img-view>
