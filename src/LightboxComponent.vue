@@ -21,11 +21,6 @@
         }"
         class="content">
         <div
-          :style="{
-            transform: $index === currentIndex
-              ? 'scale(' + scale + ')'
-              : ''
-          }"
           v-for="(src, $index) in imagesArr"
           :class="{
             'active': $index === currentIndex,
@@ -36,6 +31,11 @@
           flex="main:center cross:center"
           class="touch-item">
           <img
+          :style="{
+            transform: $index === currentIndex
+              ? 'scale(' + scale + ')'
+              : ''
+          }"
           :src="src">
         </div>
       </div>
@@ -221,7 +221,9 @@
         absX = 0
         absY = 0
 
+        console.log(touchStartTime)
         touchStartTime = new Date()
+        console.log(touchStartTime)
       },
 
       onTouchEnd (e) {
@@ -325,10 +327,10 @@
       top: 0;
       right: 0;
       z-index: 2000;
-      width: 45px;
-      height: 45px;
+      width: 30px;
+      height: 30px;
       background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQgAAABYCAQAAACjBqE3AAAB6klEQVR4Ae3bsWpUQRTG8YkkanwCa7GzVotsI/gEgk9h4Vu4ySLYmMYgbJrc3lrwZbJwC0FMt4j7F6Y4oIZrsXtgxvx/1c0ufEX4cnbmLCmSJEmSJEmSJEmSJP3XCBPvbJU+8doWmDFwyZpLBmYlNJebz0KwzykwsuSYJSNwykEJreV2BaBMaLIQZ2xYcFgqDlmw4ayE/FwL0dDk4Qh4W37DAjgqIT+3HRbigjH+iikVdxgZStgyN0Su2sXIeTwTT+esdpcbIlfNAuZ/TxresG4zV8kYWSZNiKUTokMMSWeIwTNEn4fK2TW3gRNgVkJLuVksROA9G+bEvoATNlBCa7nZXEwdxEZxzpKRKFh+bsv8LmPFmhX1OwfIz81jIRJQ5eeqG9B+riRJkiRJkiRJkiRJkiRJkiRJUkvA/8RQoEpKlJWINFkJ62AlrEP/mNBibnv2yz/A3t7Uq3LcpoxP8COjC1T5vxoAD5VdoEqdDrd5QuW1swtUSaueh3zkiuBiqgtA2OlkeMcP/uDqugsJdbjHF65VdPMKwS0+WQc/MgKvrIOHysB9vgPwk8+85hmPbnQdvHZyDMAFD7L3EOpgMcVdvnHFS0/vlatrXvCVx0U9gt3fxvnA0/hB4nmRJEmSJEmSJEmSJGmHfgFLaDPoMu5xWwAAAABJRU5ErkJggg==) 0 0 no-repeat;
-      background-position: 0 -44px
+      background-position: -10px -50px
     }
     .content {
       z-index: 1000;
