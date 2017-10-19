@@ -61,6 +61,8 @@
 
   let direction
   let touchStartTime
+  let distance = 0
+
   const FAST_CLICK_T = 200
   const TRANSITION_T = 300
   const SLIDE_DISTANCE = 50
@@ -88,6 +90,7 @@
         duration: 0,
         currentIndex: this.index,
         isSlide: false,
+        isPinch: false,
         clientWidth: document.body.clientWidth
         // imagesArr: this.images
       }
@@ -155,6 +158,11 @@
       slide (index) {
         let { clientWidth, addTransitionTime } = this
         this.isSlide = true
+
+        // Reset
+        this.isPinch = false
+        this.scale = 1
+
         this.offsetX = -index * clientWidth
         addTransitionTime(() => {
           this.isSlide = false
@@ -181,8 +189,11 @@
         this.offsetY = 0
         this.offsetX = -currentIndex * clientWidth
 
+        if (!this.isPinch) {
+          this.scale = 1
+        }
+
         direction = undefined
-        this.scale = 1
         this.opacity = 1
         this.isSlide = false
 
@@ -221,9 +232,8 @@
         absX = 0
         absY = 0
 
-        console.log(touchStartTime)
+        distance = 0
         touchStartTime = new Date()
-        console.log(touchStartTime)
       },
 
       onTouchEnd (e) {
@@ -254,12 +264,28 @@
       onMove (e) {
         let {touches} = e
 
-        if (touches.length !== 1) {
+        if (this.isSlide) {
           return
         }
 
-        if (this.isSlide) {
+        if (touches.length === 2) {
+          const x1 = touches[0].pageX
+          const y1 = touches[0].pageY
+          const x2 = touches[1].pageX
+          const y2 = touches[1].pageY
+
+          const curDistance = Math.sqrt((x1 - x2) * (x1 - x2) +
+            (y1 - y2) * (y1 - y2))
+
+          if (distance && curDistance - distance) {
+            this.doScale((curDistance - distance) / 100)
+          }
+
+          distance = Math.sqrt((x1 - x2) * (x1 - x2) +
+            (y1 - y2) * (y1 - y2))
           return
+        } else {
+          this.isPinch = false
         }
 
         offsetY = touches[0].pageY - startY
@@ -282,6 +308,19 @@
             // Do scale
             this.scale = 1 - Math.abs(offsetY / 1000)
           }
+        }
+      },
+
+      doScale (ratio) {
+        this.scale += ratio
+        this.isPinch = true
+
+        if (this.scale > 3) {
+          this.scale = 3
+        }
+
+        if (this.scale < 0.5) {
+          this.scale = 0.5
         }
       },
 
